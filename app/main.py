@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -9,18 +9,13 @@ from dotenv import load_dotenv
 import os
 import time
 from sqlalchemy.orm import Session
-from . import models
+from . import models, schemas
 from .database import engine, get_db
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-
-class Post(BaseModel):
-    title: str
-    content: str
-    published: bool = True
 
 load_dotenv()
 
@@ -54,7 +49,7 @@ async def root():
     return {"message": "Hello, World!"}
 
 
-@app.get("/posts") # decorator is actually turn this function into path operation or route
+@app.get("/posts", response_model=List[schemas.Post]) # decorator is actually turn this function into path operation or route
 async def get_posts(db: Session = Depends(get_db)):
     # cursor.execute("""SELECT * from posts """)
     # posts = cursor.fetchall()
@@ -62,8 +57,8 @@ async def get_posts(db: Session = Depends(get_db)):
     return {"status": posts}
 
 
-@app.post("/post", status_code=status.HTTP_201_CREATED)
-async def create_post(post: Post, db:Session=Depends(get_db)):
+@app.post("/post", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
+async def create_post(post: schemas.PostCreate, db:Session=Depends(get_db)):
     # cursor.execute('''INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING * ''', (post.title, post.content, post.published))
     # new_post = cursor.fetchone()
     # conn.commit()
@@ -76,10 +71,10 @@ async def create_post(post: Post, db:Session=Depends(get_db)):
     db.commit()
     db.refresh(new_post)
 
-    return {"data": new_post}  
+    return new_post  
 
 
-@app.get("/posts/{id}")
+@app.get("/posts/{id}", response_model=schemas.Post)
 def get_post(id: int, db:Session=Depends(get_db)):
     # cursor.execute('''SELECT * from posts WHERE id = %s ''', (str(id)))
     # post = cursor.fetchone()
@@ -107,8 +102,9 @@ def delete_post(id: int, db:Session=Depends(get_db)):
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-@app.put("/posts/{id}")
-def update_post(id: int, post: Post, db:Session=Depends(get_db)):
+
+@app.put("/posts/{id}", response_model=schemas.Post)
+def update_post(id: int, post: schemas.PostCreate, db:Session=Depends(get_db)):
     # cursor.execute('''UPDATE posts SET title = %s, content = %s, published = %s WHERE id = %s RETURNING * ''', (post.title, post.content, post.published, str(id)))
     # updated_post = cursor.fetchone()
     # conn.commit()
@@ -121,4 +117,4 @@ def update_post(id: int, post: Post, db:Session=Depends(get_db)):
     post_query.update(post.dict(),synchronize_session=False)
     db.commit()
     
-    return {"data": post_query.first()}
+    return post_query.first()
