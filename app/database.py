@@ -11,6 +11,18 @@ DB_USERNAME = os.getenv('DB_USERNAME')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
 DB_HOST = os.getenv('DB_HOST')
 
+# to work with raw sequal
+# while True:
+#     try:
+#         conn = psycopg2.connect(host='localhost', database='fastApi', user='postgres', password=os.getenv('DB_PASSWORD'), cursor_factory=RealDictCursor)
+#         cursor = conn.cursor()
+#         print('Databses connection was succesfull!')
+#         break
+#     except Exception as error:
+#         print('Connection to databse failed')
+#         print('Error: ', error)
+#         time.sleep(2)
+
 if DB_USERNAME and DB_PASSWORD and DB_HOST:
     # URL encode the password to handle special characters like @
     encoded_password = quote_plus(DB_PASSWORD)

@@ -10,7 +10,7 @@ from fastapi.security import OAuth2PasswordBearer
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
 
 SECRET_KEY = os.getenv('SECRET_JWT_STRING')
-ALGORITHM = "HS256"
+ALGORITHM = os.getenv('JWT_ALGORITHM')
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 
