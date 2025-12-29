@@ -1,6 +1,7 @@
 from fastapi import Response, status, HTTPException, Depends,APIRouter
 from typing import List, Optional
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from .. import models, schemas, oauth2
 from ..database import get_db
 
@@ -9,10 +10,14 @@ router = APIRouter(
     tags=['Posts']
 )
 
-@router.get("/", response_model=List[schemas.Post]) # decorator is actually turn this function into path operation or route
+# @router.get("/") # decorator is actually turn this function into path operation or route
+@router.get("/", response_model=List[schemas.PostOut]) # decorator is actually turn this function into path operation or route
 async def get_posts(db: Session = Depends(get_db), current_user:int=Depends(oauth2.get_current_user), limit:int= 10, skip:int=0, search:Optional[str]=""):
-    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
-    return posts
+    # posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+
+    posts = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+
+    return [{"votes": votes, **{**post.__dict__, "owner": post.owner}} for post, votes in posts]
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
