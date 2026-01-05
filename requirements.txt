@@ -47,4 +47,5 @@ starlette==0.47.3
 typer==0.16.1
 typing-inspection==0.4.1
 typing_extensions==4.15.0
-ujson==5.11.0gunicorn==23.0.0
+ujson==5.11.0
+gunicorn==23.0.0
