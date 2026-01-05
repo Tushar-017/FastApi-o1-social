@@ -10,6 +10,7 @@ load_dotenv()
 DB_USERNAME = os.getenv('DB_USERNAME')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
 DB_HOST = os.getenv('DB_HOST')
+DB_NAME = os.getenv('DB_NAME')
 
 # to work with raw sequal
 # while True:
@@ -26,7 +27,7 @@ DB_HOST = os.getenv('DB_HOST')
 if DB_USERNAME and DB_PASSWORD and DB_HOST:
     # URL encode the password to handle special characters like @
     encoded_password = quote_plus(DB_PASSWORD)
-    SQLALCHEMY_DATABASE_URL = f'postgresql://{DB_USERNAME}:{encoded_password}@{DB_HOST}/fastApi'
+    SQLALCHEMY_DATABASE_URL = f'postgresql://{DB_USERNAME}:{encoded_password}@{DB_HOST}/{DB_NAME}'
 else:
     # Fallback to SQLite if PostgreSQL credentials not configured
     print('DB_URL fail')

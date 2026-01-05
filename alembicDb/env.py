@@ -11,13 +11,14 @@ from urllib.parse import quote_plus
 DB_USERNAME = os.getenv('DB_USERNAME')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
 DB_HOST = os.getenv('DB_HOST')
+DB_NAME = os.getenv('DB_NAME')
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 # URL encode the password to handle special characters like @
 encoded_password = quote_plus(DB_PASSWORD) if DB_PASSWORD else ""
 # Escape % signs for ConfigParser by doubling them
-escaped_url = f'postgresql+psycopg2://{DB_USERNAME}:{encoded_password}@{DB_HOST}/fastApi'.replace('%', '%%')
+escaped_url = f'postgresql+psycopg2://{DB_USERNAME}:{encoded_password}@{DB_HOST}/{DB_NAME}'.replace('%', '%%')
 config.set_main_option("sqlalchemy.url", escaped_url)
 
 # Interpret the config file for Python logging.
