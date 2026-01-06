@@ -2,11 +2,15 @@ from fastapi import FastAPI
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from .database import engine
+from .models import Base
 from .routers import post, user, auth, vote
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
 origins = ["*"]
+
 
 
 app.add_middleware(
