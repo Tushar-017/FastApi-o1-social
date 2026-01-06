@@ -39,6 +39,12 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base= declarative_base()
 
+# Drop and recreate all tables if in development mode
+if os.getenv('ENVIRONMENT') == 'Production':
+    Base.metadata.drop_all(bind=engine)
+
+Base.metadata.create_all(bind=engine)
+
 def get_db():
     db = SessionLocal()
     try:
