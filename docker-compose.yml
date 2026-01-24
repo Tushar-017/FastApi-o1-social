@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  web:
+    build: .
+    container_name: fastapi_app
+    ports:
+      - "8000:8000"
+    environment:
+      - SECRET_JWT_STRING=
+      - JWT_ALGORITHM=
+    depends_on:
+      - db
+    volumes:
+      - .:/usr/src/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    environment:
+      - DB_HOST=
+      - DB_USERNAME=
+      - DB_PASSWORD=
+      - DB_NAME=
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
